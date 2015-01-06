@@ -22,7 +22,7 @@ public class QrcodeUtil {
 		// "C:/test/ic_launcher.png", "C:/test/apk-ngbf.png");
 
 		QrcodeUtil.generate("http://gdown.baidu.com/data/wisegame/07995b1aad7046f4/xiaomo_1.apk", "C:/test/gplus_64.png","C:/test/gplus_qr.png");
-
+		System.out.println("OK...");
 		// generateQrcodeAttachLogo("http://10.253.46.75/portal/ngbf-m-ngbf-0.6.0.apk",
 		// "C:/test/apk-ngbf.jpg","C:/test/ngbf-t-2.png");
 	}

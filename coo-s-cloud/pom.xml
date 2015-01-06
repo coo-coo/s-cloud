@@ -14,7 +14,44 @@
 	<description>coo-s-cloud</description>
 
 	<dependencies>
-		<!-- weixin dependency -->
+		<!-- NGBF -->
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-util</artifactId>
+			<version>2.4.0.0</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-ntp</artifactId>
+			<version>2.4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-mongo</artifactId>
+			<version>2.4.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-cache</artifactId>
+			<version>2.4.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-sms</artifactId>
+			<version>2.4.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- Weixin -->
 		<dependency>
 			<groupId>com.ericxu131</groupId>
 			<artifactId>EXWechat</artifactId>
@@ -29,7 +66,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- qrcode dependency -->
+		<!-- Qrcode -->
 		<dependency>
 			<groupId>com.google.zxing</groupId>
 			<artifactId>core</artifactId>
@@ -44,11 +81,11 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- JSON dependency-->
+		<!-- JSON dependency -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.2.4</version>
+			<version>2.2.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -59,16 +96,23 @@
 			<version>2.4</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- TODO -->
+
+		<!-- Baidu BAE -->
 		<dependency>
-			<groupId>com.kingstar.ngbf</groupId>
-			<artifactId>ngbf-s-util</artifactId>
-			<version>2.3.0.0</version>
-			<type>jar</type>
-			<scope>provided</scope>
+			<groupId>com.baidu.bae</groupId>
+			<artifactId>baev3-sdk</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
 		</dependency>
-	
+
+		<dependency>
+			<groupId>com.baidu.bae</groupId>
+			<artifactId>bae-log</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Others -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
