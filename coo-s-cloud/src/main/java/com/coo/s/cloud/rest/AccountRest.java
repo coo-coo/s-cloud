@@ -18,8 +18,7 @@ import com.coo.s.cloud.CloudFactory;
 import com.coo.s.cloud.CooException;
 import com.coo.s.cloud.model.Account;
 import com.coo.s.cloud.model.Focus;
-import com.coo.s.cloud.model.ModelManager;
-import com.kingstar.ngbf.s.cache.ICacheAble;
+import com.kingstar.ngbf.s.cache.IRepository;
 import com.kingstar.ngbf.s.mongo.MongoItem;
 import com.kingstar.ngbf.s.mongo.QueryAttrs;
 import com.kingstar.ngbf.s.ntp.NtpHead;
@@ -44,32 +43,46 @@ public class AccountRest extends GenericRest {
 	public NtpMessage infoByMobile(@PathVariable("mobile") String mobile) {
 		QueryAttrs query = QueryAttrs.blank().add("mobile", mobile);
 		// 查询获得列表，因为，数据较简单，直接从Mongo数据库中获得
-		MongoItem mi = getMongo().findItemOne(Account.C_NAME, query);
+		MongoItem mi = getMongo().findItemOne(Account.SET, query);
 		return change(mi);
 	}
 
 	/**
 	 * [用户调用] 获得Profile的信息,通过手机号获取
 	 */
-	@RequestMapping(value = "/info/_id/{_id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/info/uid/{uid}", method = RequestMethod.GET)
 	@ResponseBody
-	public NtpMessage infoById(@PathVariable("_id") String _id) {
-		MongoItem mi = getMongo().getItem(Account.C_NAME, _id);
+	public NtpMessage infoByUid(@PathVariable("uid") String uid) {
+		// 获得对象
+		MongoItem mi = getAccountMI(uid);
 		return change(mi);
 	}
 
 	/**
 	 * [Admin调用]账号状态变更，用于Admin管理 url?op=139xxxxxxxx
 	 */
-	@RequestMapping(value = "/update/_id/{_id}/status/{status}", method = RequestMethod.GET)
+	@RequestMapping(value = "/update/uid/{uid}/status/{status}", method = RequestMethod.GET)
 	@ResponseBody
 	public NtpMessage updateStatus(HttpServletRequest req,
-			@PathVariable("_id") String _id, @PathVariable("status") int status) {
+			@PathVariable("uid") String uid,
+			@PathVariable("status") String status) {
+		// 获得对象
+		MongoItem mi = getAccountMI(uid);
+		// 更新数据
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("status", status);
 		map.put("updater", this.getOperator(req));
-		getMongo().update(Account.C_NAME, _id, map);
+		getMongo().update(Account.SET, mi.get_id(), map);
 		return NtpMessage.ok();
+	}
+
+	/**
+	 * 通过uid来获得MongoItem
+	 */
+	private MongoItem getAccountMI(String uid) {
+		// TODO 从缓存中获取...
+		QueryAttrs query = QueryAttrs.blank().add("uid", uid);
+		return getMongo().findItemOne(Account.SET, query);
 	}
 
 	/**
@@ -82,15 +95,15 @@ public class AccountRest extends GenericRest {
 		// TODO Map对象?获得Android客户端传来的data(Topic)的数据
 		NtpMessage sm = NtpMessage.bind(data);
 		if (sm != null) {
-			// account._id
-			String _id = (String) sm.get("_id");
-			// 字段名称 & 值
+			// 获得对象
+			String uid = (String) sm.get("uid");
+			MongoItem mi = getAccountMI(uid);
+			// 字段名称 & 值,直接Map对象传递到数据库中
 			String key = (String) sm.get("key");
 			String value = (String) sm.get("value");
-			// 直接Map对象传递到数据库中
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put(key, value);
-			getMongo().update(Account.C_NAME, _id, item);
+			getMongo().update(Account.SET, mi.get_id(), item);
 		} else {
 			resp = resp.head(NtpHead.PARAMETER_ERROR);
 		}
@@ -114,9 +127,7 @@ public class AccountRest extends GenericRest {
 			if (mi != null) {
 				// TODO 其它属性? 待处理....
 				Account fb = new Account();
-				// Merge对象 先转换成对象，再传递
-				// 不能用MongoItem.toMap()到M端,可能会产生Integer到Double的默认转换(GSON的问题)
-				ModelManager.merge(mi, fb);
+				fb.merge(mi);
 				resp.add(fb);
 			}
 		}
@@ -131,14 +142,14 @@ public class AccountRest extends GenericRest {
 	public NtpMessage listByAll() {
 		QueryAttrs query = QueryAttrs.blank().desc("_tsu");
 		// 查询获得列表，因为，数据较简单，直接从Mongo数据库中获得
-		List<MongoItem> items = getMongo().findItems(Account.C_NAME, query);
+		List<MongoItem> items = getMongo().findItems(Account.SET, query);
 		NtpMessage resp = NtpMessage.ok();
 		for (MongoItem mi : items) {
 			// TODO 其它属性? 待处理....
 			Account fb = new Account();
 			// Merge对象 先转换成对象，再传递
 			// 不能用MongoItem.toMap()到M端,可能会产生Integer到Double的默认转换(GSON的问题)
-			ModelManager.merge(mi, fb);
+			fb.merge(mi);
 			resp.add(fb);
 		}
 		return resp;
@@ -157,20 +168,20 @@ public class AccountRest extends GenericRest {
 			}
 
 			// 【注册】生成短信验证码，存储在MC中,(一个账号一天最多获取验证码3次?)
-			
+
 			// 生成验证码
 			String sms = StringUtil.getRandomNumberCode(6);
 
 			// 发送校验码
-			sendSms(mobile,sms);
-			
+			sendSms(mobile, sms);
+
 			// 存储验证码到MC中 默认存2分钟,M端控制2分钟内不能重发...
 			// TODO 可能废短信很多?
 			getMC().put(MC_PREFIX_SMS + mobile, sms,
-					ICacheAble.CACHE_STAND_60 * 2);
-			
+					IRepository.MIN_1 * 2);
+
 			logger.debug("短信校验码:" + mobile + "\t" + sms);
-			
+
 			sm.set("sms_code", sms);
 		} catch (CooException e) {
 			sm = NtpMessage.error(e.getMessage());
@@ -192,11 +203,12 @@ public class AccountRest extends GenericRest {
 	/**
 	 * [用户调用] 账号注册! 验证验证码的正确性
 	 */
-	@RequestMapping(value = "/register/mobile/{mobile}/sms/{sms}/password/{password}", method = RequestMethod.GET)
+	@RequestMapping(value = "/register/mobile/{mobile}/sms/{sms}/password/{password}/source/{source}", method = RequestMethod.GET)
 	@ResponseBody
 	public NtpMessage register(@PathVariable("mobile") String mobile,
 			@PathVariable("sms") String sms,
-			@PathVariable("password") String password) {
+			@PathVariable("password") String password,
+			@PathVariable("source") String source) {
 		NtpMessage sm = NtpMessage.ok();
 		try {
 			if (isMobileExist(mobile)) {
@@ -205,24 +217,29 @@ public class AccountRest extends GenericRest {
 
 			// 注册第二步，验证验证码的正确性,从MC中取出SMS
 			String value = (String) getMC().getValue(MC_PREFIX_SMS + mobile);
-			boolean isSmsValid = (value != null && value.equals(sms)) ? true
+			boolean smsValid = (value != null && value.equals(sms)) ? true
 					: false;
 
-			if (!isSmsValid) {
+			if (!smsValid) {
 				throw new CooException("验证码错误,请重新获得验证码!");
 			}
 
 			// 注册账号信息
 			Account account = new Account(mobile, Account.TYPE_COMMON);
+			// 设置ID和APP注册来源
+			String uid = this.genUid();
+			account.setUid(uid);
+			account.setSource(source);
+			// TODO password移动端加密?
 			account.setPassword(password);
-			Map<String, Object> item = ModelManager.toMap(account);
-			String _id = getMongo().insert(Account.C_NAME, item);
+			
+			// 插入...
+			String _id = getMongo().insert(Account.SET, account.toMap());
 			if (_id == null) {
 				throw new CooException("注册失败");
 			}
 			// 返回，用于M端保存
-			sm.set("mobile", mobile).set("id", _id)
-					.set("type", Account.TYPE_COMMON);
+			sm.set("uid", uid).set("type", Account.TYPE_COMMON);
 		} catch (CooException e) {
 			sm = NtpMessage.error(e.getMessage());
 		}
@@ -241,13 +258,13 @@ public class AccountRest extends GenericRest {
 			// 登陆在mongoDB中查找
 			QueryAttrs query = QueryAttrs.blank().add("mobile", mobile)
 					.add("password", password);
-			MongoItem mi = getMongo().findItemOne(Account.C_NAME, query);
+			MongoItem mi = getMongo().findItemOne(Account.SET, query);
 
 			if (mi == null) {
 				throw new CooException("用户名或密码错误!");
 			}
-			sm.set("mobile", mobile).set("id", mi.get_id())
-					.set("type", Account.TYPE_COMMON);
+			sm.set("uid", (String) mi.get("uid")).set("type",
+					Account.TYPE_COMMON);
 		} catch (CooException e) {
 			sm = NtpMessage.error(e.getMessage());
 		}
@@ -257,13 +274,16 @@ public class AccountRest extends GenericRest {
 	/**
 	 * [用户调用] 密码修改执行，M端绑定
 	 */
-	@RequestMapping(value = "/update/_id/{_id}/password/{password}", method = RequestMethod.GET)
+	@RequestMapping(value = "/update/uid/{uid}/password/{password}", method = RequestMethod.GET)
 	@ResponseBody
-	public NtpMessage updatePassword(@PathVariable("_id") String _id,
+	public NtpMessage updatePassword(@PathVariable("uid") String uid,
 			@PathVariable("password") String password) {
+		// 获得对象
+		MongoItem mi = getAccountMI(uid);
+		// 更新对象
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("password", password);
-		getMongo().update(Account.C_NAME, _id, map);
+		getMongo().update(Account.SET, mi.get_id(), map);
 		return NtpMessage.ok();
 	}
 
@@ -283,7 +303,7 @@ public class AccountRest extends GenericRest {
 	 */
 	public static boolean isMobileExist(String mobile) {
 		QueryAttrs query = QueryAttrs.blank().add("mobile", mobile);
-		MongoItem mi = getMongo().findItemOne(Account.C_NAME, query);
+		MongoItem mi = getMongo().findItemOne(Account.SET, query);
 		return mi == null ? true : false;
 	}
 
@@ -298,8 +318,7 @@ public class AccountRest extends GenericRest {
 		focus.setSubject(subject);
 		focus.setType(type);
 		// 转化为Map对象
-		Map<String, Object> item = ModelManager.toMap(focus);
-		getMongo().insert(Focus.C_NAME, item);
+		getMongo().insert(Focus.C_NAME, focus.toMap());
 		return NtpMessage.ok();
 	}
 
@@ -321,6 +340,15 @@ public class AccountRest extends GenericRest {
 		}
 		// 取消 account对subject的关联关系
 		return NtpMessage.ok();
+	}
+
+	/**
+	 * 产生account的uid,参加业务数据的识别,传递采用uid进行传递
+	 * 
+	 * @return
+	 */
+	private String genUid() {
+		return StringUtil.uuid();
 	}
 
 }

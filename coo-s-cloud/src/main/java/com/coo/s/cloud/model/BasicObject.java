@@ -2,7 +2,14 @@ package com.coo.s.cloud.model;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.beanutils.PropertyUtils;
+
+import com.kingstar.ngbf.s.mongo.MongoItem;
+import com.kingstar.ngbf.s.util.GenericsUtil;
+import com.kingstar.ngbf.s.util.PubString;
 
 /**
  * @description
@@ -17,7 +24,7 @@ public abstract class BasicObject implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 6121507204868751924L;
 
-	@Column(name = "_id", label = "Mongo主键ID,如果是null，则表示该对象未被实例化，参加业务计算")
+	@Column(name = "_id", label = "Mongo主键ID,如果是null，则表示该对象未被实例化，不参加业务计算,否则数据迁移不好办")
 	protected String _id = null;
 
 	@Column(name = "_tsi", label = "系统数据生成时间戳:参见MongoItem")
@@ -26,17 +33,11 @@ public abstract class BasicObject implements java.io.Serializable {
 	@Column(name = "_tsu", label = "系统数据的更新时间戳:参见MongoItem")
 	public long _tsu = -1;
 
-	@Column(name = "owner", label = "拥有者账号：对应M端的HOST")
+	@Column(name = "owner", label = "拥有者账号：对应Account的uid和tsi")
 	protected String owner = null;
 
-	@Column(name = "owner_id", label = "拥有者账号ID,关联Account表中的_id")
-	protected String owner_id = null;
-
-	@Column(name = "updater", label = "数据更新者账号")
+	@Column(name = "updater", label = "数据最近更新者账号：对应Account的uid和tsu")
 	protected String updater = null;
-
-	@Column(name = "status", label = "状态=0，缺省值")
-	protected Integer status = 0;
 
 	/**
 	 * 支持是否选中...
@@ -73,14 +74,6 @@ public abstract class BasicObject implements java.io.Serializable {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
 	}
 
 	/**
@@ -129,14 +122,6 @@ public abstract class BasicObject implements java.io.Serializable {
 		this.updater = updater;
 	}
 
-	public String getOwner_id() {
-		return owner_id;
-	}
-
-	public void setOwner_id(String owner_id) {
-		this.owner_id = owner_id;
-	}
-
 	public void set_tsi(long _tsi) {
 		this._tsi = _tsi;
 	}
@@ -144,4 +129,78 @@ public abstract class BasicObject implements java.io.Serializable {
 	public void set_tsu(long _tsu) {
 		this._tsu = _tsu;
 	}
+
+	// ////////////////////////////////////////////////
+	// /////////// 实现一些方法供调用 ///////////
+	// ////////////////////////////////////////////////
+
+	/**
+	 * 将指定的BasicObject根据@Column注解,生成简单的Map对象 用于将对象生成到MongoItem中 进队有注解的字段进行实现
+	 * M端发送对象回来,Server端进行转换[方向:M->S]
+	 */
+	public Map<String, Object> toMap() {
+		Map<String, Object> item = new HashMap<String, Object>();
+		// 获得所有的Field列表，遍历循环
+		List<Field> fields = GenericsUtil.getClassSimpleFields(this.getClass(),
+				true);
+		for (Field field : fields) {
+			Column col = field.getAnnotation(Column.class);
+			if (col != null) {
+				String fieldName = field.getName();
+				Object value = "";
+				try {
+					value = PropertyUtils.getProperty(this, fieldName);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				// 键值...缺省是参照注解,如果没有声明,则按照字段名称来
+				String key = col.name();
+				if (PubString.isNullOrSpace(key)) {
+					key = fieldName;
+				}
+				item.put(key, value);
+			}
+		}
+		// 放置其它全部属性
+		// item.putAll(bo.getAttrs());
+		return item;
+	}
+
+	/**
+	 * 将MI对象的值Merge到BO中[方向:S->M]
+	 */
+	public void merge(MongoItem mi) {
+		// 获得所有的Field列表，遍历循环
+		List<Field> fields = GenericsUtil.getClassSimpleFields(this.getClass(),
+				true);
+		for (Field field : fields) {
+			Column col = field.getAnnotation(Column.class);
+			if (col != null) {
+				try {
+					// Type type = field.getGenericType();
+					// 根据注解的名称,获得数据库的Key
+					Object value = mi.get(col.name());
+					PropertyUtils.setProperty(this, field.getName(), value);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		// 处理专有的框架的字段
+		this.set_id(mi.get_id());
+		this.set_tsu(getMiLong(mi, "_tsu"));
+		this.set_tsi(getMiLong(mi, "_tsi"));
+	}
+
+	public static Long getMiLong(MongoItem mi, String key) {
+		Object value = mi.get(key);
+		return value == null ? 0l : (Long) value;
+	}
+
+	public static String getMiStr(MongoItem mi, String key) {
+		Object value = mi.get(key);
+		return value == null ? "" : value.toString();
+	}
+
 }

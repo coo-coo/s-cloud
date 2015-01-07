@@ -36,7 +36,7 @@
 			<version>2.4.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.kingstar.ngbf</groupId>
 			<artifactId>ngbf-s-cache</artifactId>

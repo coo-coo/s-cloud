@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 数据库
+ * 数据表格注解...
  * 
  * @description
  * @author boqing.shen

@@ -29,11 +29,11 @@ public class Focus extends BasicObject {
 	/**
 	 * 状态：有效
 	 */
-	public static final int STATUS_VALID = 0;
+	public static final String STATUS_VALID = "0";
 	/**
 	 * 状态：无效
 	 */
-	public static final int STATUS_INVALID = 1;
+	public static final String STATUS_INVALID = "1";
 
 	@Column(name = "type", label = "关注类型")
 	private String type = "";
@@ -44,15 +44,16 @@ public class Focus extends BasicObject {
 	@Column(name = "account", label = "登录账号")
 	private String account = "";
 	
+	@Column(name = "status", label = "状态，0:有效；1:无效")
+	private String status = STATUS_VALID;
+	
 	/**
 	 * 根据关注状态、关注周期,建立“我”关注的Topic
 	 */
 	@Column(name = "period", label = "周期,单位(天)")
 	private Integer period = 1;
 
-//	@Column(name = "status", label = "状态，0:有效；1:无效")
-//	private Integer status = STATUS_VALID;
-
+	
 	public String getType() {
 		return type;
 	}
@@ -60,7 +61,6 @@ public class Focus extends BasicObject {
 	public void setType(String type) {
 		this.type = type;
 	}
-
 	
 
 	/**
@@ -110,7 +110,11 @@ public class Focus extends BasicObject {
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(Integer status) {
+	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getStatus() {
+		return status;
 	}
 }

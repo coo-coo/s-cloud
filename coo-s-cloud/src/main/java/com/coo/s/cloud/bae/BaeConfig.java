@@ -27,7 +27,7 @@ public class BaeConfig {
 	public static String CACHE_ADDR = CACHE_HOST + ":" + CACHE_PORT;
 
 	// ///////////////////////////////////////////////////////
-	// ///////////////   以下暂未支持       /////////////////////////
+	// /////////////// 以下暂未支持 /////////////////////////
 	// ///////////////////////////////////////////////////////
 
 	/*** MySQL相关配置 ***/
@@ -39,6 +39,13 @@ public class BaeConfig {
 	public static String REDISNAME = "QTQTzJQhMKabjpSTIEX";
 	public static String REDISHOST = "redis.duapp.com";
 	public static String REDISPORT = "80";
+
+	// ///////////////////////////////////////////////////////
+
+	/*** Cache相关配置 ***/
+	public static String CACHEID = "pPdkLzIvgBaHmqJvQSz";
+	public static String CACHEHOST = "cache.duapp.com";
+	public static String CACHEPORT = "20243";
 
 	/*** Image配置 ***/
 	public static String IMAGEHOST = "image.duapp.com";

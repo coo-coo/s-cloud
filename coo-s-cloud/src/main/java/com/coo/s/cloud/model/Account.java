@@ -10,56 +10,54 @@ package com.coo.s.cloud.model;
 
 public class Account extends BasicObject {
 
-	public static String C_NAME = "coo_account";
+	public static String SET = "coo_account";
 	
-	@Column(name = "social_uid", label = "社会化ID")
-	private String social_uid = "";
+	@Column(name = "uid", label = "社会化ID,唯一,不采用mongo_id,便于迁移")
+	private String uid = "";
 
-	@Column(name = "social_src", label = "社会化资源来源:LOCAL(参见account)|BAIDU|WEIXIN...")
-	private String social_src = "LOCAL";
-	
-	@Column(name = "social_name", label = "社会化资源名称")
-	private String social_name = "LOCAL";
-	
-	@Column(name = "account", label = "账号,本系统账号")
-	private String account = "";
+	@Column(name = "source", label = "社会化资源来源:LOCAL(参见account)|BAIDU|WEIXIN...")
+	private String source = "LOCAL";
+
+	// @Column(name = "account", label = "无账号概念，采用mobile、email等代替")
+	// private String account = "";
 
 	@Column(name = "mobile", label = "手机号")
 	private String mobile = "";
 
-	@Column(name = "password", label = "密码")
+	@Column(name = "email", label = "邮件号")
+	private String email = "";
+
+	@Column(name = "password", label = "密码,需加密")
 	private String password = "";
 
 	@Column(name = "type", label = "账号类型:0：一般账号；1：系统账号；2：管理员帐号；3：测试账号")
 	private String type = "0";
 
 	@Column(name = "gender", label = "性别:0：男；1：女；9：未填")
-	private Integer gender = -1;
-	
+	private String gender = "9";
+
+	@Column(name = "status", label = "账号状态")
+	private String status = STATUS_VALID;
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4421956633636541182L;
-	/**
-	 * 账号类型：一般账号
-	 */
-	public static final String TYPE_COMMON = "0";
-	/**
-	 * 账号类型：系统账号
-	 */
-	public static final String TYPE_SYSTEM = "1";
-	/**
-	 * 账号类型：管理员账号
-	 */
-	public static final String TYPE_ADMIN = "2";
-	/**
-	 * 账号类型：测试账号
-	 */
-	public static final String TYPE_TEST = "3";
 
-	public static int STATUS_VALID = 1; // 已注册
-	public static int STATUS_LOCKED = 5; // 已锁定
-	public static int STATUS_DELETED = 9; // 已删除
+	// 账号类型：一般账号
+	public static final String TYPE_COMMON = "0";
+	// 账号类型：系统账号
+	public static final String TYPE_SYSTEM = "1";
+	// 账号类型：管理员账号
+	public static final String TYPE_ADMIN = "2";
+	// 账号类型：测试账号
+	public static final String TYPE_TEST = "3";
+	// 账号状态：已注册
+	public static final String STATUS_VALID = "1";
+	// 账号状态：已锁定
+	public static final String STATUS_LOCKED = "5";
+	// 账号状态：已删除
+	public static final String STATUS_DELETED = "9";
 
 	/**
 	 * 构造函数
@@ -107,44 +105,43 @@ public class Account extends BasicObject {
 		this.password = password;
 	}
 
-	public String getSocial_uid() {
-		return social_uid;
+	public String getUid() {
+		return uid;
 	}
 
-	public void setSocial_uid(String social_uid) {
-		this.social_uid = social_uid;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
-	public String getSocial_src() {
-		return social_src;
+	public String getSource() {
+		return source;
 	}
 
-	public void setSocial_src(String social_src) {
-		this.social_src = social_src;
+	public void setSource(String source) {
+		this.source = source;
 	}
 
-	public String getSocial_name() {
-		return social_name;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setSocial_name(String social_name) {
-		this.social_name = social_name;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public String getAccount() {
-		return account;
-	}
-
-	public void setAccount(String account) {
-		this.account = account;
-	}
-
-	public Integer getGender() {
+	public String getGender() {
 		return gender;
 	}
 
-	public void setGender(Integer gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }
