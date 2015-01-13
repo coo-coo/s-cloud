@@ -34,10 +34,10 @@ public abstract class BasicObject implements java.io.Serializable {
 	public long _tsu = -1;
 
 	@Column(name = "owner", label = "拥有者账号：对应Account的uid和tsi")
-	protected String owner = null;
+	protected String owner = "";
 
 	@Column(name = "updater", label = "数据最近更新者账号：对应Account的uid和tsu")
-	protected String updater = null;
+	protected String updater = "";
 
 	/**
 	 * 支持是否选中...

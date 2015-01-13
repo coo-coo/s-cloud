@@ -16,15 +16,15 @@ import com.kingstar.ngbf.s.ntp.NtpMessage;
 
 @Controller
 @RequestMapping("/mock")
-public class GenericRest {
-	
+public class GenericCloudRest {
+
 	@RequestMapping(value = "/hello", method = RequestMethod.GET)
 	@ResponseBody
 	public NtpMessage hello() {
 		NtpMessage sm = NtpMessage.ok().set("hello", "coo");
 		return sm;
 	}
-	
+
 	/**
 	 * 将单个MI转换成为NtpMessage返回
 	 */
@@ -37,21 +37,20 @@ public class GenericRest {
 		}
 		return resp;
 	}
-	
+
 	/**
 	 * 获得操作者账号，即M端的Host，采用doGet获取 url?op=130xxxxxxxx
 	 */
-	protected String getOperator(HttpServletRequest req){
+	protected String getOperator(HttpServletRequest req) {
 		String operator = req.getParameter("op");
-		if(operator==null){
+		if (operator == null) {
 			operator = "UNKNOWN";
 		}
 		return operator;
 	}
-	
-	///////////////////////////////////////////////////////
-	
-	
+
+	// /////////////////////////////////////////////////////
+
 	protected static INgbfMongoClient getMongo() {
 		return CloudFactory.getMongo();
 	}
@@ -59,6 +58,5 @@ public class GenericRest {
 	protected static IRepository getMC() {
 		return CloudFactory.getMC();
 	}
-	
-	
+
 }

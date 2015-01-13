@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.coo.s.cloud.CloudFactory;
-import com.coo.s.cloud.bae.BaeFactory;
 import com.kingstar.ngbf.s.cache.IRepository;
 import com.kingstar.ngbf.s.mongo.INgbfMongoClient;
 import com.kingstar.ngbf.s.mongo.MongoItem;
@@ -21,13 +20,21 @@ import com.kingstar.ngbf.s.sms.Sms;
 import com.kingstar.ngbf.s.util.StringUtil;
 
 @Controller
-@RequestMapping("/bae/demo")
+@RequestMapping("/bae")
 public class BaeDemoRest {
+
+	@RequestMapping(value = "/init", method = RequestMethod.GET)
+	@ResponseBody
+	public NtpMessage init() {
+		// 初始化从云端获得,先手工执行此命令,进行切换,参见CloudFactory
+		CloudFactory.CLOUD = true;
+		return NtpMessage.ok().set("cloud", CloudFactory.CLOUD);
+	}
 
 	@RequestMapping(value = "/mongo/save", method = RequestMethod.GET)
 	@ResponseBody
 	public NtpMessage mongoSave() {
-		INgbfMongoClient mongo = BaeFactory.getMongo();
+		INgbfMongoClient mongo = CloudFactory.getMongo();
 		Map<String, Object> item = new HashMap<String, Object>();
 		item.put("name", "SBQ");
 		item.put("age", 36);
@@ -40,7 +47,8 @@ public class BaeDemoRest {
 	@ResponseBody
 	public NtpMessage mongoFind() {
 		QueryAttrs query = QueryAttrs.blank().add("name", "SBQ");
-		List<MongoItem> list = BaeFactory.getMongo().findItems("C_DEMO", query);
+		List<MongoItem> list = CloudFactory.getMongo().findItems("C_DEMO",
+				query);
 		NtpMessage sm = NtpMessage.ok().set("size", list.size());
 		for (MongoItem mi : list) {
 			sm.add(mi);
@@ -52,7 +60,7 @@ public class BaeDemoRest {
 	@ResponseBody
 	public NtpMessage mcSave(@PathVariable("key") String key,
 			@PathVariable("value") String value) {
-		IRepository mc = BaeFactory.getMc();
+		IRepository mc = CloudFactory.getMC();
 		mc.put(key, value, IRepository.MIN_1);
 		return NtpMessage.ok().set(key, value)
 				.set("ts", System.currentTimeMillis());
@@ -61,7 +69,7 @@ public class BaeDemoRest {
 	@RequestMapping(value = "/mc/get/key/{key}", method = RequestMethod.GET)
 	@ResponseBody
 	public NtpMessage mcGet(@PathVariable("key") String key) {
-		IRepository mc = BaeFactory.getMc();
+		IRepository mc = CloudFactory.getMC();
 		String value = (String) mc.getValue(key);
 		return NtpMessage.ok().set(key, value)
 				.set("ts", System.currentTimeMillis());

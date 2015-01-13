@@ -17,16 +17,17 @@
 		<!-- NGBF -->
 		<dependency>
 			<groupId>com.kingstar.ngbf</groupId>
-			<artifactId>ngbf-s-util</artifactId>
-			<version>2.4.0.0</version>
+			<artifactId>ngbf-s-ntp</artifactId>
+			<version>2.4.2.0</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.kingstar.ngbf</groupId>
-			<artifactId>ngbf-s-ntp</artifactId>
-			<version>2.4.1.0</version>
+			<artifactId>ngbf-s-util</artifactId>
+			<version>2.4.0.0</version>
+			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 
@@ -48,6 +49,13 @@
 			<groupId>com.kingstar.ngbf</groupId>
 			<artifactId>ngbf-s-sms</artifactId>
 			<version>2.4.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.kingstar.ngbf</groupId>
+			<artifactId>ngbf-s-quartz</artifactId>
+			<version>2.2.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		

@@ -27,11 +27,11 @@ import com.kingstar.ngbf.s.sms.Sms;
 import com.kingstar.ngbf.s.util.StringUtil;
 
 /**
- * 实现账号的注册、密码修改、账号登录等操作
+ * 实现账号的注册、密码修改、账号登录等操作 TODO REST注解缓存,切片处理
  */
 @Controller
 @RequestMapping("/account")
-public class AccountRest extends GenericRest {
+public class AccountRest extends GenericCloudRest {
 
 	private Logger logger = Logger.getLogger(AccountRest.class);
 
@@ -172,13 +172,14 @@ public class AccountRest extends GenericRest {
 			// 生成验证码
 			String sms = StringUtil.getRandomNumberCode(6);
 
-			// 发送校验码
-			sendSms(mobile, sms);
+			// 发送校验码,在真实环境下...
+			if (CloudFactory.CLOUD) {
+				sendSms(mobile, sms);
+			}
 
 			// 存储验证码到MC中 默认存2分钟,M端控制2分钟内不能重发...
 			// TODO 可能废短信很多?
-			getMC().put(MC_PREFIX_SMS + mobile, sms,
-					IRepository.MIN_1 * 2);
+			getMC().put(MC_PREFIX_SMS + mobile, sms, IRepository.MIN_1 * 2);
 
 			logger.debug("短信校验码:" + mobile + "\t" + sms);
 
@@ -232,7 +233,7 @@ public class AccountRest extends GenericRest {
 			account.setSource(source);
 			// TODO password移动端加密?
 			account.setPassword(password);
-			
+
 			// 插入...
 			String _id = getMongo().insert(Account.SET, account.toMap());
 			if (_id == null) {
@@ -304,7 +305,7 @@ public class AccountRest extends GenericRest {
 	public static boolean isMobileExist(String mobile) {
 		QueryAttrs query = QueryAttrs.blank().add("mobile", mobile);
 		MongoItem mi = getMongo().findItemOne(Account.SET, query);
-		return mi == null ? true : false;
+		return mi == null ? false : true;
 	}
 
 	/**
@@ -318,7 +319,7 @@ public class AccountRest extends GenericRest {
 		focus.setSubject(subject);
 		focus.setType(type);
 		// 转化为Map对象
-		getMongo().insert(Focus.C_NAME, focus.toMap());
+		getMongo().insert(Focus.SET, focus.toMap());
 		return NtpMessage.ok();
 	}
 
@@ -332,11 +333,11 @@ public class AccountRest extends GenericRest {
 		QueryAttrs query = QueryAttrs.blank().add("account", account)
 				.add("subject", subject).add("type", type)
 				.add("status", Focus.STATUS_VALID);
-		MongoItem mi = getMongo().findItemOne(Focus.C_NAME, query);
+		MongoItem mi = getMongo().findItemOne(Focus.SET, query);
 		if (mi != null) {
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("status", Focus.STATUS_INVALID);
-			getMongo().update(Focus.C_NAME, mi.get_id(), item);
+			getMongo().update(Focus.SET, mi.get_id(), item);
 		}
 		// 取消 account对subject的关联关系
 		return NtpMessage.ok();
@@ -348,7 +349,7 @@ public class AccountRest extends GenericRest {
 	 * @return
 	 */
 	private String genUid() {
-		return StringUtil.uuid();
+		return StringUtil.uuid().replace("-", "");
 	}
 
 }

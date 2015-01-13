@@ -12,6 +12,8 @@ public class Contact extends BasicObject {
 	 */
 	private static final long serialVersionUID = 4794341824964936905L;
 
+	public static String SET = "coo_contact";
+
 	/**
 	 * 通讯薄名称:(通讯薄获得)
 	 */

@@ -12,20 +12,13 @@ import com.kingstar.ngbf.s.mongo.NgbfMongoClient;
  */
 public class BaeFactory {
 
-	private static INgbfMongoClient mongoClient;
-
-	private static IRepository repository;
-
 	/**
 	 * 获得BAE-Mongo服务
 	 * 
 	 * @since 1.0.0.0
 	 */
-	public static INgbfMongoClient getMongo() {
-		if (mongoClient == null) {
-			mongoClient = new NgbfMongoClient(BaeConfig.MONGO);
-		}
-		return mongoClient;
+	public static INgbfMongoClient buildMongoClient() {
+		return new NgbfMongoClient(BaeConfig.MONGO);
 	}
 
 	/**
@@ -33,10 +26,7 @@ public class BaeFactory {
 	 * 
 	 * @since 1.0.0.0
 	 */
-	public static IRepository getMc() {
-		if (repository == null) {
-			repository = new BaeRepository();
-		}
-		return repository;
+	public static IRepository buildMcRepository() {
+		return new BaeRepository();
 	}
 }

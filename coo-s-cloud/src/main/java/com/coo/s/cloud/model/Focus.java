@@ -7,7 +7,7 @@ package com.coo.s.cloud.model;
  */
 public class Focus extends BasicObject {
 
-	public static String C_NAME = "coo_focus";
+	public static String SET = "coo_focus";
 
 	private static final long serialVersionUID = -8259889018653740830L;
 	/**

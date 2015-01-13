@@ -1,7 +1,7 @@
 package com.coo.s.cloud.model;
 
 /**
- * 账号信息,社会化信息,支持BAIDU、WEIXIN等平台第三方接入
+ * 账号信息:社会化信息,支持BAIDU、WEIXIN等平台第三方接入
  * 
  * @description
  * @author boqing.shen
