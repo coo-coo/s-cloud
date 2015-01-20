@@ -22,8 +22,8 @@ public class Feedback extends BasicObject {
 	@Column(name = "app_name", label = "应用名称")
 	private String app_name = "";
 
-	@Column(name = "status", label = "反馈状态")
-	private String status = STATUS_UNSOLVED;
+//	@Column(name = "status", label = "反馈状态")
+//	private String status = STATUS_UNSOLVED;
 
 	// 反馈状态:未处理
 	public static String STATUS_UNSOLVED = "0";
@@ -52,14 +52,6 @@ public class Feedback extends BasicObject {
 
 	public void setApp_name(String app_name) {
 		this.app_name = app_name;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 }

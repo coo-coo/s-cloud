@@ -36,8 +36,8 @@ public class Account extends BasicObject {
 	@Column(name = "gender", label = "性别:0：男；1：女；9：未填")
 	private String gender = "9";
 
-	@Column(name = "status", label = "账号状态")
-	private String status = STATUS_VALID;
+//	@Column(name = "status", label = "账号状态")
+//	private String status = STATUS_VALID;
 
 	/**
 	 * 
@@ -65,6 +65,7 @@ public class Account extends BasicObject {
 	public Account(String mobile, String type) {
 		this.mobile = mobile;
 		this.type = type;
+		this.status = STATUS_VALID;
 	}
 
 	/**
@@ -135,13 +136,5 @@ public class Account extends BasicObject {
 
 	public void setGender(String gender) {
 		this.gender = gender;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 }

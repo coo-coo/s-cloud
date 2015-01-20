@@ -39,6 +39,9 @@ public abstract class BasicObject implements java.io.Serializable {
 	@Column(name = "updater", label = "数据最近更新者账号：对应Account的uid和tsu")
 	protected String updater = "";
 
+	@Column(name = "status", label = "状态")
+	protected String status = "";
+	
 	/**
 	 * 支持是否选中...
 	 */
@@ -203,4 +206,12 @@ public abstract class BasicObject implements java.io.Serializable {
 		return value == null ? "" : value.toString();
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 }

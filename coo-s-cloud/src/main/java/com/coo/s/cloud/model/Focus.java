@@ -44,8 +44,8 @@ public class Focus extends BasicObject {
 	@Column(name = "account", label = "登录账号")
 	private String account = "";
 	
-	@Column(name = "status", label = "状态，0:有效；1:无效")
-	private String status = STATUS_VALID;
+//	@Column(name = "status", label = "状态，0:有效；1:无效")
+//	private String status = STATUS_VALID;
 	
 	/**
 	 * 根据关注状态、关注周期,建立“我”关注的Topic
@@ -105,16 +105,5 @@ public class Focus extends BasicObject {
 	 */
 	public void setPeriod(Integer period) {
 		this.period = period;
-	}
-
-	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public String getStatus() {
-		return status;
 	}
 }
